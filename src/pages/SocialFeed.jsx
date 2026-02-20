@@ -70,7 +70,7 @@ function ProcessingBadge({ status }) {
   return null
 }
 
-function PostCard({ post, status, aiResult, fakeResult, onImport, importing }) {
+function PostCard({ post, status, aiResult, fakeResult }) {
   const platform = PLATFORM_CONFIG[post.platform]
   const Icon = platform.icon
 
@@ -183,8 +183,18 @@ export default function SocialFeed({ addComplaint }) {
         setStats(prev => ({ ...prev, imported: prev.imported + 1 }))
 
         // Auto-add to complaints feed
+        // Real Delhi coords so these show on heat map spread across city
+        const delhiSpots = [
+          [28.6315, 77.2167], [28.5677, 77.2433], [28.7298, 77.1116], [28.6517, 77.1906],
+          [28.5823, 77.0500], [28.6289, 77.0836], [28.6692, 77.2887], [28.7006, 77.1318],
+          [28.5488, 77.2519], [28.6780, 77.2223], [28.7147, 77.1902], [28.5756, 77.1935],
+        ]
+        const spot = delhiSpots[Math.floor(Math.random() * delhiSpots.length)]
+        const newId = Date.now() + Math.random()
+        const complaintNum = 2000 + Math.floor(Math.random() * 999)
         const complaint = {
-          id: Date.now() + Math.random(),
+          id: newId,
+          complaintId: `CMR-2026-${complaintNum}`,
           title: post.raw.slice(0, 60).replace(/#\w+/g, "").trim() + (post.raw.length > 60 ? "..." : ""),
           description: post.raw.replace(/#\w+/g, "").trim(),
           location: "Auto-detected from post",
@@ -195,6 +205,8 @@ export default function SocialFeed({ addComplaint }) {
           timestamp: new Date().toISOString(),
           source: post.platform,
           sourceHandle: post.handle,
+          lat: spot[0] + (Math.random() - 0.5) * 0.01,
+          lng: spot[1] + (Math.random() - 0.5) * 0.01,
         }
         addComplaint && addComplaint(complaint)
       }
